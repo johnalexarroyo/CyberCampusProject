@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CyberCampus — Digital Security for Students (Sprint 1 Increment)</title>
+  <meta name="description" content="Interactive digital security educational module for university students - Sprint 1 Increment.">
+
+  <!-- ======================================================= -->
+  <!-- 1. GLOBAL STYLES & CSS VARIABLES                        -->
+  <!-- ======================================================= -->
+  <style>
+    :root {
+      --bg: #050914;
+      --panel: #0b1222;
+      --panel2: #101a2e;
+      --line: #20304d;
+      --text: #eef5ff;
+      --muted: #9db0c9;
+      --cyan: #4de3ff;
+      --violet: #8d7cff;
+      --green: #53e6a8;
+      --red: #ff647c;
+      --yellow: #ffd166;
+      --shadow: 0 20px 70px #0008;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 3px;
+    }
+
+    .app {
+      min-height: 100vh;
+      background: radial-gradient(circle at 15% 10%, #10264c 0, #050914 34%),
+                  radial-gradient(circle at 90% 90%, #25134a 0, #050914 38%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app:before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .2;
+      background-image: linear-gradient(#4de3ff12 1px, transparent 1px),
+                        linear-gradient(90deg, #4de3ff12 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, #000, transparent 85%);
+    }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #050914d9;
+      border-bottom: 1px solid #ffffff12;
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: auto;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 900;
+      letter-spacing: .3px;
+      cursor: pointer;
+    }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      color: #06101d;
+      box-shadow: 0 0 30px #4de3ff44;
+    }
+
+    .logo svg {
+      width: 22px;
+    }
+
+    .navgrow {
+      flex: 1;
+    }
+
+    .progressWrap {
+      width: min(300px, 35vw);
+    }
+
+    .progressTop {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .bar {
+      height: 7px;
+      border-radius: 99px;
+      background: #ffffff10;
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--violet));
+      transition: .4s;
+    }
+
+    /* Screens Container */
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 42px 22px 80px;
+    }
+
+    .screen {
+      display: none;
+      animation: enter .35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: calc(100vh - 130px);
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 11px;
+      border: 1px solid #4de3ff33;
+      background: #4de3ff0d;
+      border-radius: 999px;
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 7vw, 78px);
+      line-height: .98;
+      margin: 18px 0;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #fff, var(--cyan), #a894ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 680px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 13px;
+      padding: 12px 17px;
+      cursor: pointer;
+      font-weight: 800;
+      color: #06101d;
+      background: linear-gradient(135deg, var(--cyan), #a3f3ff);
+      box-shadow: 0 10px 30px #4de3ff22;
+    }
+
+    .btn.secondary {
+      color: var(--text);
+      background: #ffffff08;
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .heroArt {
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .orb {
+      width: min(420px, 80vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #233d68 0 8%, #0e1a32 35%, #050914 67%);
+      border: 1px solid #4de3ff33;
+      box-shadow: 0 0 100px #4de3ff1c, inset 0 0 80px #8d7cff1c;
+      display: grid;
+      place-items: center;
+    }
+
+    .orb svg {
+      width: 62%;
+      filter: drop-shadow(0 0 22px #4de3ff66);
+    }
+
+    .orbit {
+      position: absolute;
+      width: 92%;
+      aspect-ratio: 1;
+      border: 1px dashed #4de3ff33;
+      border-radius: 50%;
+      animation: spin 20s linear infinite;
+    }
+
+    .orbit:after {
+      content: "";
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--cyan);
+      top: 7%;
+      left: 50%;
+      box-shadow: 0 0 22px var(--cyan);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Course Map */
+    .sectionTitle {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 25px;
+    }
+
+    .sectionTitle h2 {
+      font-size: 36px;
+      margin: 8px 0;
+    }
+
+    .sectionTitle p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 650px;
+    }
+
+    .moduleMap {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .mapItem {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff05;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mapItem.activeIncrement {
+      border-color: var(--cyan);
+      background: #4de3ff0d;
+    }
+
+    .mapItem b {
+      display: block;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    /* Panels & Lessons Layout */
+    .panel {
+      background: linear-gradient(145deg, #ffffff08, #ffffff03);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .lessonHead {
+      display: flex;
+      gap: 22px;
+      align-items: flex-start;
+      margin-bottom: 25px;
+    }
+
+    .lessonNum {
+      width: 58px;
+      height: 58px;
+      flex: 0 0 auto;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #4de3ff22, #8d7cff22);
+      border: 1px solid #4de3ff33;
+      color: var(--cyan);
+      font-weight: 900;
+    }
+
+    .lessonHead h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.03;
+      margin: 3px 0 7px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .lessonLayout {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+    }
+
+    .contentPanel {
+      padding: 28px;
+    }
+
+    .contentPanel h3 {
+      margin-top: 0;
+    }
+
+    .contentPanel p {
+      color: #c4d1e2;
+    }
+
+    .source {
+      font-size: 11px;
+      color: #7f95b2;
+      border-top: 1px solid var(--line);
+      padding-top: 13px;
+      margin-top: 20px;
+    }
+
+    .illustration {
+      min-height: 330px;
+      padding: 20px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 40%, #16305a 0, #0b1325 48%, #080d19 100%);
+    }
+
+    .illustration svg {
+      width: 92%;
+      max-height: 310px;
+    }
+
+    /* Flip Cards */
+    .interaction {
+      margin-top: 18px;
+      padding: 23px;
+    }
+
+    .interaction h3 {
+      margin-top: 0;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .flip {
+      min-height: 150px;
+      perspective: 900px;
+      cursor: pointer;
+    }
+
+    .flipInner {
+      height: 100%;
+      position: relative;
+      transition: transform .55s;
+      transform-style: preserve-3d;
+    }
+
+    .flip.flipped .flipInner {
+      transform: rotateY(180deg);
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 17px;
+      background: #ffffff05;
+    }
+
+    .back {
+      transform: rotateY(180deg);
+      background: #0c1c24;
+      border-color: #53e6a844;
+    }
+
+    .face small {
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    .face strong {
+      display: block;
+      margin-top: 15px;
+    }
+
+    .footerNav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    /* Video Container (Responsive & Compact) */
+    .videoWrapper {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .videoContainer {
+      position: relative;
+      padding-bottom: 177.77%;
+      height: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #000;
+    }
+
+    .videoContainer iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #0e1a2e;
+      border: 1px solid #4de3ff44;
+      padding: 12px 15px;
+      border-radius: 12px;
+      transform: translateY(120px);
+      opacity: 0;
+      transition: .3s;
+      z-index: 50;
+    }
+
+    .toast.show {
+      transform: none;
+      opacity: 1;
+    }
+
+    /* Mobile First Adjustments */
+    @media(max-width:850px) {
+      .hero,
+      .lessonLayout {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding-top: 20px;
+      }
+      .heroArt {
+        order: -1;
+      }
+      .orb {
+        width: 280px;
+      }
+      .moduleMap {
+        grid-template-columns: 1fr 1fr;
+      }
+      .progressWrap {
+        display: none;
+      }
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .videoWrapper {
+        width: 100%;
+        max-width: 280px;
+      }
+      .nav {
+        padding: 11px 14px;
+      }
+      main {
+        padding: 28px 14px 60px;
+      }
+      .contentPanel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ======================================================= -->
+    <!-- 2. HEADER & NAVIGATION PROGRESS                         -->
+    <!-- ======================================================= -->
+    <header>
+      <div class="nav">
+        <div class="brand" onclick="go('home')">
+          <span class="logo">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" fill="currentColor"/>
+              <path d="M8.5 11.8l2.2 2.2 4.8-5" stroke="#06101d" stroke-width="2"/>
+            </svg>
+          </span>
+          CyberCampus
+        </div>
+        <div class="navgrow"></div>
+        <div class="progressWrap">
+          <div class="progressTop">
+            <span id="progressLabel">Sprint 1 Increment</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="bar">
+            <i id="progressBar"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ======================================================= -->
+      <!-- 3. WELCOME SCREEN & LEARNING OBJECTIVES (#home)         -->
+      <!-- ======================================================= -->
+      <section class="screen active" id="home">
+        <div class="hero">
+          <div>
+            <span class="eyebrow">● Sprint 1 Increment · Mobile First</span>
+            <h1>
+              <span class="gradient">Cybersecurity</span><br>
+              <span>starts with you.</span>
+            </h1>
+            <p>
+              <strong>Learning Objective:</strong> Introduce first-year undergraduate students to essential digital security habits, enabling them to identify threat vectors, vulnerabilities, and everyday digital risks across university platforms.
+            </p>
+            <div class="actions">
+              <button class="btn" onclick="go('video-intro')">Start Sprint 1 Flow →</button>
+              <button class="btn secondary" onclick="go('map')">View Content Map</button>
+            </div>
+            <p class="muted" style="font-size:12px;margin-top:18px">
+              Target duration: Under 8 Minutes · Accessible Captions Included
+            </p>
+          </div>
+          <div class="heroArt">
+            <div class="orbit"></div>
+            <div class="orb">
+              <svg viewBox="0 0 360 360" fill="none">
+                <path d="M180 35l105 43v80c0 78-45 129-105 164C120 287 75 236 75 158V78l105-43z" fill="#071221" stroke="#4de3ff" stroke-width="5"/>
+                <rect x="112" y="142" width="136" height="100" rx="22" fill="#0d2540" stroke="#8d7cff" stroke-width="4"/>
+                <path d="M145 142v-28c0-26 15-43 35-43s35 17 35 43v28" stroke="#4de3ff" stroke-width="12" stroke-linecap="round"/>
+                <circle cx="180" cy="190" r="12" fill="#53e6a8"/>
+                <path d="M180 202v18" stroke="#53e6a8" stroke-width="6" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div id="map" style="padding-top:20px">
+          <div class="sectionTitle">
+            <div>
+              <span class="eyebrow">Content Architecture</span>
+              <h2>Project Roadmap</h2>
+              <p>Sprint 1 increment activates Module 01 foundations and initial multimedia onboarding.</p>
+            </div>
+          </div>
+          <div class="moduleMap">
+            <div class="mapItem activeIncrement">
+              <b>01 · Foundations</b>
+              <span>Active in Sprint 1 ✓</span>
+            </div>
+            <div class="mapItem">
+              <b>02 · Accounts</b>
+              <span>Sprint 2 Backlog</span>
+            </div>
+            <div class="mapItem">
+              <b>03 · Phishing</b>
+              <span>Sprint 2 Backlog</span>
+            </div>
+            <div class="mapItem">
+              <b>04 · Devices</b>
+              <span>Sprint 3 Backlog</span>
+            </div>
+            <div class="mapItem">
+              <b>05 · Privacy</b>
+              <span>Sprint 3 Backlog</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- 4. MULTIMEDIA RESOURCE: INTRODUCTORY VIDEO             -->
+      <!-- ======================================================= -->
+      <section class="screen" id="video-intro">
+        <div class="lessonHead">
+          <div class="lessonNum">🎬</div>
+          <div>
+            <span class="eyebrow">Multimedia Resource 1 · Sprint 1</span>
+            <h2>Introduction to Digital Security</h2>
+            <p class="muted">Review this audiovisual briefing on phishing and authentication attacks before proceeding.</p>
+          </div>
+        </div>
+
+        <div class="panel contentPanel" style="text-align: center;">
+          <div class="videoWrapper">
+            <div class="videoContainer">
+              <iframe 
+                src="https://www.youtube.com/embed/hUFODDvqDyk?rel=0" 
+                title="How AiTM Attacks Bypass MFA | Man-in-the-Middle Phishing Explained" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+          <p class="source" style="margin-top: 15px;">
+            Complies with Appendix 3 requirement: Audiovisual content includes closed captions.
+          </p>
+        </div>
+
+        <div class="footerNav">
+          <button class="btn secondary" onclick="go('home')">← Home</button>
+          <button class="btn" onclick="go('m1b')">Start Module 01 →</button>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- 5. ONE COMPLETE LEARNING SECTION: MODULE 01             -->
+      <!-- ======================================================= -->
+      <section class="screen" id="m1b">
+        <div class="lessonHead">
+          <div class="lessonNum">01</div>
+          <div>
+            <span class="eyebrow">Module 1 · Complete Learning Section</span>
+            <h2>Threats, Vulnerabilities and Risk</h2>
+          </div>
+        </div>
+        <div class="lessonLayout">
+          <article class="panel contentPanel">
+            <h3>Understanding the Security Chain</h3>
+            <p>
+              A threat is an event that may cause harm; a vulnerability is a weakness that can be exploited; risk combines the likelihood of an event with its impact. In college life, typical examples include accounts without MFA, unpatched software, or oversharing details publicly.
+            </p>
+            <div class="source">Source: NIST, <em>Cybersecurity Basics</em> (2025)</div>
+          </article>
+          <aside class="panel illustration">
+            <svg viewBox="0 0 500 330">
+              <g fill="none" stroke-width="4">
+                <circle cx="120" cy="165" r="72" stroke="#ff647c"/>
+                <circle cx="250" cy="165" r="72" stroke="#ffd166"/>
+                <circle cx="380" cy="165" r="72" stroke="#53e6a8"/>
+                <path d="M177 165h36M307 165h36" stroke="#4de3ff" stroke-width="9" stroke-linecap="round"/>
+              </g>
+              <text x="120" y="158" fill="#fff" font-size="20" text-anchor="middle">THREAT</text>
+              <text x="120" y="184" fill="#9db0c9" font-size="14" text-anchor="middle">hazard</text>
+              <text x="250" y="158" fill="#fff" font-size="20" text-anchor="middle">WEAKNESS</text>
+              <text x="250" y="184" fill="#9db0c9" font-size="14" text-anchor="middle">gap</text>
+              <text x="380" y="158" fill="#fff" font-size="20" text-anchor="middle">RISK</text>
+              <text x="380" y="184" fill="#9db0c9" font-size="14" text-anchor="middle">impact</text>
+            </svg>
+          </aside>
+        </div>
+        <div class="panel interaction">
+          <h3>Interactive Concept Cards: Click each card to reveal</h3>
+          <div class="cards">
+            <div class="flip" onclick="this.classList.toggle('flipped'); checkM1();">
+              <div class="flipInner">
+                <div class="face">
+                  <small>01</small>
+                  <strong>Threat</strong>
+                </div>
+                <div class="face back">
+                  Example: An attacker sending a spoofed campus email.
+                </div>
+              </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('flipped'); checkM1();">
+              <div class="flipInner">
+                <div class="face">
+                  <small>02</small>
+                  <strong>Vulnerability</strong>
+                </div>
+                <div class="face back">
+                  Example: Using an 8-character common password without MFA.
+                </div>
+              </div>
+            </div>
+            <div class="flip" onclick="this.classList.toggle('flipped'); checkM1();">
+              <div class="flipInner">
+                <div class="face">
+                  <small>03</small>
+                  <strong>Risk</strong>
+                </div>
+                <div class="face back">
+                  Example: Losing access to academic records or private files.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footerNav">
+          <button class="btn secondary" onclick="go('video-intro')">← Video Resource</button>
+          <button class="btn" onclick="finishSprint1()">Complete Sprint 1 Increment ✓</button>
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- 6. SPRINT 1 INCREMENT COMPLETION MODAL/PANEL            -->
+      <!-- ======================================================= -->
+      <section class="screen" id="s1-summary">
+        <div class="sectionTitle">
+          <div>
+            <span class="eyebrow">Sprint 1 Review</span>
+            <h2>First module operational</h2>
+            <p></p>
+          </div>
+        </div>
+        <div class="panel contentPanel" style="text-align: center; padding: 40px 20px;">
+          <h3 style="color: var(--green); font-size: 26px;">Increment Reviewable & Complete</h3>
+          <p style="max-width: 600px; margin: 15px auto; color: var(--muted);">
+            
+          </p>
+          <div style="margin-top: 30px;">
+            <button class="btn" onclick="go('home')">Return to Start</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- 7. SPRINT 1 JAVASCRIPT LOGIC                            -->
+  <!-- ======================================================= -->
+  <script>
+    let m1Completed = false;
+
+    function go(id) {
+      if (id === 'map') {
+        const mapEl = document.getElementById('map');
+        if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function checkM1() {
+      if (!m1Completed) {
+        m1Completed = true;
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('progressPct').textContent = '100%';
+        toast('Module 01 Explored ✓');
+      }
+    }
+
+    function finishSprint1() {
+      document.getElementById('progressBar').style.width = '100%';
+      document.getElementById('progressPct').textContent = '100%';
+      go('s1-summary');
+    }
+
+    function toast(text) {
+      const el = document.getElementById('toast');
+      el.textContent = text;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 1800);
+    }
+  </script>
+</body>
+</html>
