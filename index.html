@@ -421,8 +421,27 @@
       padding: 23px;
     }
 
-    .interaction h3 {
-      margin-top: 0;
+    .interactionHead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .interactionHead h3 {
+      margin: 0;
+    }
+
+    .cardBadge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--cyan);
+      background: #4de3ff0d;
     }
 
     .cards {
@@ -456,6 +475,10 @@
       border-radius: 16px;
       padding: 17px;
       background: #ffffff05;
+    }
+
+    .flip.explored .face {
+      border-color: #53e6a866;
     }
 
     .back {
@@ -546,7 +569,7 @@
         grid-template-columns: 1fr 1fr;
       }
       .progressWrap {
-        display: none;
+        width: 135px;
       }
       .cards {
         grid-template-columns: 1fr;
@@ -587,7 +610,7 @@
         <div class="navgrow"></div>
         <div class="progressWrap">
           <div class="progressTop">
-            <span id="progressLabel">Sprint 1 Increment</span>
+            <span id="progressLabel">0 / 3 concepts</span>
             <span id="progressPct">0%</span>
           </div>
           <div class="bar">
@@ -685,7 +708,7 @@
           <div class="videoWrapper">
             <div class="videoContainer">
               <iframe 
-                src="https://www.youtube.com/embed/hUFODDvqDyk?rel=0" 
+                src="https://www.youtube.com/embed/hUFODDvqDyk?rel=0&cc_load_policy=1&cc_lang_pref=en" 
                 title="How AiTM Attacks Bypass MFA | Man-in-the-Middle Phishing Explained" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen>
@@ -693,7 +716,7 @@
             </div>
           </div>
           <p class="source" style="margin-top: 15px;">
-            Complies with Appendix 3 requirement: Audiovisual content includes closed captions.
+            Complies with Appendix 3 requirement: Audiovisual content includes closed captions (CC).
           </p>
         </div>
 
@@ -740,9 +763,12 @@
           </aside>
         </div>
         <div class="panel interaction">
-          <h3>Interactive Concept Cards: Click each card to reveal</h3>
+          <div class="interactionHead">
+            <h3>Interactive Concept Cards: Click all 3 cards to reveal definitions</h3>
+            <span class="cardBadge" id="cardCounter">0 / 3 explored</span>
+          </div>
           <div class="cards">
-            <div class="flip" onclick="this.classList.toggle('flipped'); checkM1();">
+            <div class="flip" onclick="flipCard(this, 1)">
               <div class="flipInner">
                 <div class="face">
                   <small>01</small>
@@ -753,7 +779,7 @@
                 </div>
               </div>
             </div>
-            <div class="flip" onclick="this.classList.toggle('flipped'); checkM1();">
+            <div class="flip" onclick="flipCard(this, 2)">
               <div class="flipInner">
                 <div class="face">
                   <small>02</small>
@@ -764,7 +790,7 @@
                 </div>
               </div>
             </div>
-            <div class="flip" onclick="this.classList.toggle('flipped'); checkM1();">
+            <div class="flip" onclick="flipCard(this, 3)">
               <div class="flipInner">
                 <div class="face">
                   <small>03</small>
@@ -790,14 +816,14 @@
         <div class="sectionTitle">
           <div>
             <span class="eyebrow">Sprint 1 Review</span>
-            <h2>First module operational</h2>
-            <p></p>
+            <h2>First Module Operational</h2>
+            <p>All three core cybersecurity concepts in Module 01 have been explored.</p>
           </div>
         </div>
         <div class="panel contentPanel" style="text-align: center; padding: 40px 20px;">
           <h3 style="color: var(--green); font-size: 26px;">Increment Reviewable & Complete</h3>
           <p style="max-width: 600px; margin: 15px auto; color: var(--muted);">
-            
+            This Sprint 1 build delivers the welcome screen, explicit learning objective, 5-module content architecture map, captioned audiovisual briefing, and interactive Module 01 concept cards with proportional progress tracking.
           </p>
           <div style="margin-top: 30px;">
             <button class="btn" onclick="go('home')">Return to Start</button>
@@ -814,6 +840,8 @@
   <!-- 7. SPRINT 1 JAVASCRIPT LOGIC                            -->
   <!-- ======================================================= -->
   <script>
+    const totalCards = 3;
+    const exploredCards = new Set();
     let m1Completed = false;
 
     function go(id) {
@@ -830,18 +858,32 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function checkM1() {
-      if (!m1Completed) {
+    function flipCard(cardEl, cardId) {
+      cardEl.classList.toggle('flipped');
+      cardEl.classList.add('explored');
+      exploredCards.add(cardId);
+
+      const count = exploredCards.size;
+      const pct = Math.round((count / totalCards) * 100);
+
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressPct').textContent = pct + '%';
+      document.getElementById('progressLabel').textContent = count + ' / ' + totalCards + ' concepts';
+      document.getElementById('cardCounter').textContent = count + ' / ' + totalCards + ' explored';
+
+      if (count === totalCards && !m1Completed) {
         m1Completed = true;
-        document.getElementById('progressBar').style.width = '100%';
-        document.getElementById('progressPct').textContent = '100%';
-        toast('Module 01 Explored ✓');
+        toast('Module 01 Completed: All 3 Concepts Explored ✓');
+      } else if (!m1Completed) {
+        toast('Concept ' + count + ' of ' + totalCards + ' explored');
       }
     }
 
     function finishSprint1() {
-      document.getElementById('progressBar').style.width = '100%';
-      document.getElementById('progressPct').textContent = '100%';
+      if (exploredCards.size < totalCards) {
+        toast('Please explore all 3 concept cards (' + exploredCards.size + '/3) before finishing.');
+        return;
+      }
       go('s1-summary');
     }
 
@@ -849,7 +891,7 @@
       const el = document.getElementById('toast');
       el.textContent = text;
       el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 1800);
+      setTimeout(() => el.classList.remove('show'), 2200);
     }
   </script>
 </body>
